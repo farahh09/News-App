@@ -1,11 +1,34 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:news/core/internet_checker.dart';
 import 'package:news/core/observer.dart';
+import 'package:news/core/theming/bloc/cubit.dart';
 import 'package:news/screens/home_screen.dart';
+import 'core/theming/bloc/states.dart';
+import 'di.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = MyBlocObserver();
-  runApp(const MyApp());
+  await EasyLocalization.ensureInitialized();
+  configureDependencies();
+  getIt<InternetConnectivity>().initialize();
+  runApp(
+    BlocProvider(
+      create: (context) => getIt<ThemingCubit>(),
+      child: BlocBuilder<ThemingCubit, ThemingStates>(
+        builder: (BuildContext context, state) {
+          return EasyLocalization(
+            supportedLocales: [Locale('en', 'US'), Locale('ar', 'EG')],
+            fallbackLocale: Locale('en', 'US'),
+            path: 'assets/translations',
+            child: MyApp(),
+          );
+        },
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -15,6 +38,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       routes: {HomeScreen.routeName: (context) => HomeScreen()},
     );
   }

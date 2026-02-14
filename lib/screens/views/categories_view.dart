@@ -1,28 +1,32 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:news/core/theming/extentions.dart';
 import 'package:news/models/category_model.dart';
 
 class CategoriesView extends StatelessWidget {
-  Function onClick;
+  final Function onClick;
 
   CategoriesView({super.key, required this.onClick});
 
-  var categories = CategoryModel.getCategories();
+  final categories = CategoryModel.getCategories();
 
   @override
   Widget build(BuildContext context) {
+    final isRTL = Directionality.of(context) == TextDirection.RTL;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Good Morning\nHere is Some News For You",
-            style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.w500),
-          ),
-          SizedBox(height: 16),
-          Expanded(
-            child: ListView.separated(
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "${'good_morning'.tr()}\n${'news_for_you'.tr()}",
+              style: context.title(),
+            ),
+            SizedBox(height: 16),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
               separatorBuilder: (context, index) => SizedBox(height: 12),
 
               itemBuilder: (context, index) {
@@ -49,7 +53,13 @@ class CategoriesView extends StatelessWidget {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(24),
-                                child: Image.asset(categories[index].image, fit: BoxFit.cover, width: double.infinity,),
+                                child: Image.asset(
+                                  context.isLightTheme()
+                                      ? categories[index].lightImage
+                                      : categories[index].darkImage,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                ),
                               ),
 
                               Padding(
@@ -60,12 +70,11 @@ class CategoriesView extends StatelessWidget {
                                 ),
                                 child: Container(
                                   padding: EdgeInsets.only(
-                                    left: index.isOdd ? 0 : 12,
-                                    right: index.isEven ? 0 : 12,
+                                    left: isRTL? index.isOdd ? 12 : 0 : 0,
                                   ),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(50),
-                                    color: Colors.white.withOpacity(0.5),
+                                    color: context.surface(),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -74,22 +83,23 @@ class CategoriesView extends StatelessWidget {
                                       Visibility(
                                         visible: index.isOdd,
                                         child: Image.asset(
-                                          "assets/images/arrow_left.png",
+                                          context.isLightTheme()
+                                              ? "assets/images/arrow_left.png"
+                                              : "assets/images/arrow_left_dark.png",
                                           width: 54,
                                           height: 54,
                                         ),
                                       ),
                                       Text(
-                                        "View All",
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                        'view_all'.tr(),
+                                        style: context.title(),
                                       ),
                                       Visibility(
                                         visible: index.isEven,
                                         child: Image.asset(
-                                          "assets/images/arrow_right.png",
+                                          context.isLightTheme()
+                                              ? "assets/images/arrow_right.png"
+                                              : "assets/images/arrow_right_dark.png",
                                           width: 54,
                                           height: 54,
                                         ),
@@ -107,12 +117,8 @@ class CategoriesView extends StatelessWidget {
                               left: index.isOdd ? 60 : 0,
                             ),
                             child: Text(
-                              categories[index].label,
-                              style: GoogleFonts.inter(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white
-                              ),
+                              categories[index].id.tr(),
+                              style: context.categoryLabel(),
                             ),
                           ),
                         ],
@@ -123,8 +129,8 @@ class CategoriesView extends StatelessWidget {
               },
               itemCount: categories.length,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:news/core/theming/extentions.dart';
 import 'package:news/models/category_model.dart';
 import 'package:news/screens/views/categories_view.dart';
 import 'package:news/screens/views/drawer_view.dart';
@@ -19,16 +21,27 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return LoaderOverlay(
       child: Scaffold(
+        backgroundColor: context.background(),
         drawer: DrawerView(onClick: onDrawerClicked),
         appBar: AppBar(
+          backgroundColor: context.background(),
           centerTitle: true,
+          iconTheme: IconThemeData(
+            color: context.onSurface(),
+          ),
           title: Text(
-            selectedCategory == null ? "Home" : selectedCategory!.label,
+            selectedCategory == null
+                ? 'home'.tr()
+                : selectedCategory!.id.tr(),
+            style: context.titleLarge(),
           ),
           actions: [
             IconButton(
               onPressed: () {},
-              icon: ImageIcon(AssetImage('assets/images/search.png')),
+              icon: ImageIcon(
+                AssetImage('assets/images/search.png'),
+                color: context.onSurface(),
+              ),
             ),
           ],
         ),

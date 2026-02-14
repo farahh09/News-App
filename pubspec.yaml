@@ -18,6 +18,10 @@ dependencies:
   loader_overlay: ^5.0.0
   cached_network_image: ^3.4.1
   google_fonts: ^8.0.1
+  connectivity_plus: ^7.0.0
+  injectable: ^2.7.1+4
+  get_it: ^9.2.0
+  easy_localization: ^3.0.8
 
   cupertino_icons: ^1.0.8
 
@@ -26,6 +30,8 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  injectable_generator: ^2.12.0
+  build_runner: ^2.11.1
 
 flutter:
 
@@ -33,3 +39,4 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/translations/

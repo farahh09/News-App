@@ -1,25 +1,15 @@
 import 'package:bloc/bloc.dart';
-import 'package:dio/dio.dart';
+import 'package:injectable/injectable.dart';
 import 'package:news/core/bloc/states.dart';
-import 'package:news/core/constants.dart';
+import 'package:news/core/repository/home_repo.dart';
 import 'package:news/models/news_response.dart';
 import 'package:news/models/sources_response.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
+@injectable
 class HomeCubit extends Cubit<HomeStates> {
-  late Dio dio;
+  HomeRepo repo;
 
-  HomeCubit() : super(HomeInitState()) {
-    dio = Dio(
-      BaseOptions(
-        baseUrl: AppConstants.BASEURL,
-
-        headers: {"x-api-key": AppConstants.APIKEY},
-      ),
-    );
-
-    dio.interceptors.add(PrettyDioLogger(request: true, responseBody: true));
-  }
+  HomeCubit(this.repo) : super(HomeInitState());
 
   List<Sources> sources = [];
   List<Articles> articles = [];
@@ -35,11 +25,9 @@ class HomeCubit extends Cubit<HomeStates> {
     emit(GetNewsDataLoadingState());
 
     try {
-      Response response = await dio.get(
-        "/v2/everything?sources=${sources[selectedIndex].id}",
+      NewsResponse newsResponse = await repo.getNews(
+        sources[selectedIndex].id ?? '',
       );
-
-      NewsResponse newsResponse = NewsResponse.fromJson(response.data);
 
       if (newsResponse.status == "error") {
         emit(GetNewsDataErrorState(newsResponse.message ?? ""));
@@ -56,9 +44,7 @@ class HomeCubit extends Cubit<HomeStates> {
   Future<void> getSources(String categoryId) async {
     emit(GetSourcesLoadingState());
     try {
-      Response response = await dio.get("/v2/top-headlines/sources?category=$categoryId");
-
-      SourcesResponse sourcesResponse = SourcesResponse.fromJson(response.data);
+      SourcesResponse sourcesResponse = await repo.getSources(categoryId);
 
       sources = sourcesResponse.sources ?? [];
 

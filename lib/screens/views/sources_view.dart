@@ -3,8 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:news/core/bloc/cubit.dart';
 import 'package:news/core/bloc/states.dart';
+import 'package:news/core/theming/extentions.dart';
+import 'package:news/di.dart';
 import 'package:news/screens/news_screen.dart';
-
 
 class SourcesView extends StatelessWidget {
   final String categoryId;
@@ -14,7 +15,7 @@ class SourcesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<HomeCubit>(
-      create: (context) => HomeCubit()..getSources(categoryId),
+      create: (context) => getIt<HomeCubit>()..getSources(categoryId),
       child: BlocConsumer<HomeCubit, HomeStates>(
         listener: (context, state) {
           if (state is GetSourcesLoadingState) {
@@ -33,16 +34,8 @@ class SourcesView extends StatelessWidget {
                 child: TabBar(
                   isScrollable: true,
                   indicatorColor: Colors.black,
-                  labelStyle: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                    color: Colors.black
-                  ),
-                  unselectedLabelStyle:  TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                    color: Colors.black
-                  ),
+                  labelStyle: context.titleMedium(),
+                  unselectedLabelStyle: context.titleSmall(),
                   onTap: (index) {
                     bloc.changeSelectedSource(index);
                   },
