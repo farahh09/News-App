@@ -1,19 +1,23 @@
 import 'package:bloc/bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:news/core/bloc/states.dart';
-import 'package:news/core/repository/home_repo.dart';
+import 'package:news/core/internet_checker.dart';
+import 'package:news/core/repository/home_repo_local.dart';
+import 'package:news/core/repository/home_repo_remote.dart';
 import 'package:news/models/news_response.dart';
 import 'package:news/models/sources_response.dart';
 
 @injectable
 class HomeCubit extends Cubit<HomeStates> {
-  HomeRepo repo;
+  HomeRepoRemote repo;
+  HomeRepoLocal localRepo;
 
-  HomeCubit(this.repo) : super(HomeInitState());
-
+  HomeCubit(this.repo, this.localRepo) : super(HomeInitState());
   List<Sources> sources = [];
   List<Articles> articles = [];
+  List<Articles> filteredArticles = [];
   int selectedIndex = 0;
+
 
   void changeSelectedSource(int index) {
     selectedIndex = index;
@@ -21,13 +25,30 @@ class HomeCubit extends Cubit<HomeStates> {
     getNewsData();
   }
 
+  void searchArticles(String query) {
+
+    if (query.isEmpty) {
+      filteredArticles = articles;
+    } else {
+      filteredArticles = articles.where((article) {
+        var searchQuery = query.trim().toLowerCase();
+
+        return article.title!.toLowerCase().contains(searchQuery)
+        || article.description!.contains(searchQuery)
+        || article.author!.contains(searchQuery);
+
+      }).toList();
+    }
+    emit(SearchArticlesState());
+  }
+
   Future<void> getNewsData() async {
     emit(GetNewsDataLoadingState());
 
     try {
-      NewsResponse newsResponse = await repo.getNews(
-        sources[selectedIndex].id ?? '',
-      );
+      NewsResponse newsResponse = InternetConnectivity().isConnected
+          ? await repo.getNews(sources[selectedIndex].id ?? "")
+          : await localRepo.getNews(sources[selectedIndex].id ?? "");
 
       if (newsResponse.status == "error") {
         emit(GetNewsDataErrorState(newsResponse.message ?? ""));
@@ -35,6 +56,7 @@ class HomeCubit extends Cubit<HomeStates> {
       }
 
       articles = newsResponse.articles ?? [];
+      filteredArticles = articles;
       emit(GetNewsDataSuccessState());
     } catch (e) {
       emit(GetNewsDataErrorState(e.toString()));
@@ -42,9 +64,15 @@ class HomeCubit extends Cubit<HomeStates> {
   }
 
   Future<void> getSources(String categoryId) async {
+    sources = [];
+    articles = [];
+    filteredArticles = [];
+    selectedIndex = 0;
     emit(GetSourcesLoadingState());
     try {
-      SourcesResponse sourcesResponse = await repo.getSources(categoryId);
+      SourcesResponse sourcesResponse = InternetConnectivity().isConnected
+          ? await repo.getSources(categoryId)
+          : await localRepo.getSources(categoryId);
 
       sources = sourcesResponse.sources ?? [];
 

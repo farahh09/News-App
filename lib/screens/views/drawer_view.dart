@@ -1,18 +1,18 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:news/core/theming/bloc/cubit.dart';
-import 'package:news/core/theming/extentions.dart';
+import 'package:news/core/theming/extensions.dart';
 
 class DrawerView extends StatelessWidget {
   final Function onClick;
 
-  DrawerView({super.key, required this.onClick});
+  const DrawerView({super.key, required this.onClick});
 
   @override
   Widget build(BuildContext context) {
     final currentTheme = context.isLightTheme() ? 'light'.tr() : 'dark'.tr();
-    final isArabic = context.locale.languageCode == 'ar';
-    final currentLanguage = isArabic ? 'arabic'.tr() : 'english'.tr();
+    final bool isArabic = context.locale.languageCode == 'ar';
+    final String currentLanguage = isArabic ? 'arabic'.tr() : 'english'.tr();
 
     return Container(
       color: Colors.white,
@@ -66,7 +66,6 @@ class DrawerView extends StatelessWidget {
                   Divider(color: Colors.white, thickness: 1, endIndent: 20),
                   SizedBox(height: 24),
 
-                  // Theme Section
                   Row(
                     spacing: 8,
                     children: [
@@ -101,31 +100,28 @@ class DrawerView extends StatelessWidget {
                       ),
                     ),
                     onSelected: (theme) {
-                      final lightLabel = 'light'.tr();
-                      final darkLabel = 'dark'.tr();
-
-                      if ((theme == lightLabel && !context.isLightTheme()) ||
-                          (theme == darkLabel && context.isLightTheme())) {
+                      if ((theme == 'light'.tr() && !context.isLightTheme()) ||
+                          (theme == 'dark'.tr() && context.isLightTheme())) {
                         ThemingCubit.get(context).changeTheming();
                       }
                       Navigator.pop(context);
                     },
                     menuStyle: MenuStyle(
-                      backgroundColor: WidgetStateProperty.all(Colors.black),
+                      backgroundColor: WidgetStateProperty.all(Colors.white),
                     ),
                     dropdownMenuEntries: [
                       DropdownMenuEntry(
                         label: 'light'.tr(),
                         value: 'light'.tr(),
                         style: ButtonStyle(
-                          foregroundColor: WidgetStateProperty.all(Colors.white),
+                          foregroundColor: WidgetStateProperty.all(Colors.black),
                         ),
                       ),
                       DropdownMenuEntry(
                         label: 'dark'.tr(),
                         value: 'dark'.tr(),
                         style: ButtonStyle(
-                          foregroundColor: WidgetStateProperty.all(Colors.white),
+                          foregroundColor: WidgetStateProperty.all(Colors.black),
                         ),
                       ),
                     ],
@@ -134,7 +130,6 @@ class DrawerView extends StatelessWidget {
                   Divider(color: Colors.white, thickness: 1, endIndent: 20),
                   SizedBox(height: 24),
 
-                  // Language Section
                   Row(
                     spacing: 8,
                     children: [
@@ -169,16 +164,13 @@ class DrawerView extends StatelessWidget {
                       ),
                     ),
                     menuStyle: MenuStyle(
-                      backgroundColor: WidgetStateProperty.all(Colors.black),
+                      backgroundColor: WidgetStateProperty.all(Colors.white),
                     ),
-                    onSelected: (language) async {
-                      final englishLabel = 'english'.tr();
-                      final arabicLabel = 'arabic'.tr();
-
-                      if (language == englishLabel && isArabic) {
-                        await context.setLocale(Locale('en', 'US')); // ✅ Full locale
-                      } else if (language == arabicLabel && !isArabic) {
-                        await context.setLocale(Locale('ar', 'EG')); // ✅ Full locale
+                    onSelected: (language) {
+                      if (language == 'english'.tr() && isArabic) {
+                        context.setLocale(Locale('en', 'US'));
+                      } else if (language == 'arabic'.tr() && !isArabic) {
+                        context.setLocale(Locale('ar', 'EG'));
                       }
                       Navigator.pop(context);
                     },
@@ -187,14 +179,14 @@ class DrawerView extends StatelessWidget {
                         label: 'english'.tr(),
                         value: 'english'.tr(),
                         style: ButtonStyle(
-                          foregroundColor: WidgetStateProperty.all(Colors.white),
+                          foregroundColor: WidgetStateProperty.all(Colors.black),
                         ),
                       ),
                       DropdownMenuEntry(
                         label: 'arabic'.tr(),
                         value: 'arabic'.tr(),
                         style: ButtonStyle(
-                          foregroundColor: WidgetStateProperty.all(Colors.white),
+                          foregroundColor: WidgetStateProperty.all(Colors.black),
                         ),
                       ),
                     ],

@@ -14,3 +14,5 @@ class GetNewsDataErrorState extends HomeStates {
   String errorMessage;
   GetNewsDataErrorState(this.errorMessage);
 }
+
+class SearchArticlesState extends HomeStates {}

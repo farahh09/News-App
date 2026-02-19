@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:news/core/theming/extentions.dart';
+import 'package:news/core/theming/extensions.dart';
 import 'package:news/models/category_model.dart';
 
 class CategoriesView extends StatelessWidget {
@@ -12,7 +12,7 @@ class CategoriesView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isRTL = Directionality.of(context) == TextDirection.RTL;
+    final isRTL = context.locale == Locale("ar", "EG");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: SingleChildScrollView(
@@ -70,7 +70,8 @@ class CategoriesView extends StatelessWidget {
                                 ),
                                 child: Container(
                                   padding: EdgeInsets.only(
-                                    left: isRTL? index.isOdd ? 12 : 0 : 0,
+                                    left: isRTL
+                                        ? index.isOdd ? 12 : 0 : 0,
                                   ),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(50),
@@ -84,7 +85,9 @@ class CategoriesView extends StatelessWidget {
                                         visible: index.isOdd,
                                         child: Image.asset(
                                           context.isLightTheme()
-                                              ? "assets/images/arrow_left.png"
+                                              ? isRTL
+                                              ? "assets/images/arrow_right.png"
+                                              : "assets/images/arrow_left.png"
                                               : "assets/images/arrow_left_dark.png",
                                           width: 54,
                                           height: 54,
@@ -98,7 +101,9 @@ class CategoriesView extends StatelessWidget {
                                         visible: index.isEven,
                                         child: Image.asset(
                                           context.isLightTheme()
-                                              ? "assets/images/arrow_right.png"
+                                              ? isRTL
+                                                    ? "assets/images/arrow_left.png"
+                                                    : "assets/images/arrow_right.png"
                                               : "assets/images/arrow_right_dark.png",
                                           width: 54,
                                           height: 54,

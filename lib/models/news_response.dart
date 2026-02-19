@@ -1,13 +1,25 @@
+import 'package:hive/hive.dart';
 import 'package:news/models/sources_response.dart';
 
-class NewsResponse {
+class NewsResponse extends HiveObject {
+  @HiveField(0)
   String? status;
-  String? message;
+  @HiveField(1)
   String? code;
+  @HiveField(2)
+  String? message;
+  @HiveField(3)
   int? totalResults;
+  @HiveField(4)
   List<Articles>? articles;
 
-  NewsResponse({this.status, this.totalResults, this.articles, this.code, this.message});
+  NewsResponse({
+    this.status,
+    this.totalResults,
+    this.articles,
+    this.code,
+    this.message,
+  });
 
   NewsResponse.fromJson(Map<String, dynamic> json) {
     status = json['status'];
@@ -23,14 +35,23 @@ class NewsResponse {
   }
 }
 
+@HiveType(typeId: 3)
 class Articles {
+  @HiveField(0)
   Sources? source;
+  @HiveField(1)
   String? author;
+  @HiveField(2)
   String? title;
+  @HiveField(3)
   String? description;
+  @HiveField(4)
   String? url;
+  @HiveField(5)
   String? urlToImage;
+  @HiveField(6)
   String? publishedAt;
+  @HiveField(7)
   String? content;
 
   Articles({
@@ -45,9 +66,7 @@ class Articles {
   });
 
   Articles.fromJson(Map<String, dynamic> json) {
-    source = json['source'] != null
-        ? Sources.fromJson(json['source'])
-        : null;
+    source = json['source'] != null ? Sources.fromJson(json['source']) : null;
     author = json['author'];
     title = json['title'];
     description = json['description'];

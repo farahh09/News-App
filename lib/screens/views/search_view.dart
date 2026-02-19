@@ -5,29 +5,47 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news/core/bloc/cubit.dart';
 import 'package:news/core/bloc/states.dart';
 import 'package:news/core/theming/extensions.dart';
-import 'package:news/screens/views/web_view.dart';
 
+class SearchView extends StatefulWidget {
+  final String categoryId;
+  final String query;
+  const SearchView({
+    super.key,
+    required this.categoryId,
+    required this.query,
+  });
 
-class NewsScreen extends StatelessWidget {
-  const NewsScreen({super.key});
+  @override
+  State<SearchView> createState() => _SearchViewState();
+}
 
+class _SearchViewState extends State<SearchView> {
+
+  String updatedQuery = '';
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeCubit, HomeStates>(
-      listener: (context, state) {},
       builder: (context, state) {
         var bloc = BlocProvider.of<HomeCubit>(context);
+        if (updatedQuery != widget.query) {
+          updatedQuery = widget.query;
+          bloc.searchArticles(widget.query);
+        }
+        final articles = bloc.filteredArticles;
 
-        if (state is GetSourcesLoadingState || state is GetNewsDataLoadingState) {
+        if (state is GetNewsDataErrorState) {
+          return Center(child: Text('something_went_wrong'.tr()));
+        }
+        else if (state is GetSourcesLoadingState ||
+            state is GetNewsDataLoadingState) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (state is GetNewsDataErrorState) {
-          return Center(
-            child: Text('something_went_wrong'.tr()),
-          );
+        else if (articles.isEmpty) {
+          return Center(child: Text('no_data'.tr()));
         }
 
         return ListView.builder(
+          itemCount: articles.length,
           itemBuilder: (context, index) {
             return InkWell(
               onTap: () {
@@ -39,8 +57,9 @@ class NewsScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(16),
                       child: Container(
                         decoration: BoxDecoration(
-                            color: context.onSurface(),
-                            borderRadius: BorderRadius.circular(28)),
+                          color: context.onSurface(),
+                          borderRadius: BorderRadius.circular(28),
+                        ),
                         child: Padding(
                           padding: const EdgeInsets.all(8),
                           child: Column(
@@ -48,12 +67,14 @@ class NewsScreen extends StatelessWidget {
                             children: [
                               SingleChildScrollView(
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                                   children: [
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(16),
                                       child: CachedNetworkImage(
-                                        imageUrl: bloc.articles[index].urlToImage ?? "",
+                                        imageUrl:
+                                        articles[index].urlToImage ?? "",
                                         height: 240,
                                         width: double.infinity,
                                         fit: BoxFit.cover,
@@ -61,27 +82,17 @@ class NewsScreen extends StatelessWidget {
                                     ),
                                     SizedBox(height: 8),
                                     Text(
-                                        bloc.articles[index].description ?? "",
-                                        maxLines: 5,
-                                        style: context.titleSmall().copyWith(color: context.background())),
+                                      articles[index].description ?? "",
+                                      maxLines: 5,
+                                      style: context.titleSmall().copyWith(
+                                          color: context.background()),
+                                    ),
                                   ],
                                 ),
                               ),
                               SizedBox(height: 8),
                               ElevatedButton(
-                                onPressed: () {
-                                  final url = bloc.articles[index].url;
-                                  if (url != null && url.isNotEmpty) {
-                                    Navigator.pop(context);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            WebViewScreen(url: url),
-                                      ),
-                                    );
-                                  }
-                                },
+                                onPressed: () {},
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: context.background(),
                                   padding: EdgeInsets.symmetric(vertical: 16),
@@ -90,8 +101,10 @@ class NewsScreen extends StatelessWidget {
                                   ),
                                 ),
                                 child: Center(
-                                  child: Text('view_full_article'.tr(),
-                                      style: context.titleMedium()),
+                                  child: Text(
+                                    'view_full_article'.tr(),
+                                    style: context.titleMedium(),
+                                  ),
                                 ),
                               ),
                             ],
@@ -116,7 +129,7 @@ class NewsScreen extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: CachedNetworkImage(
-                        imageUrl: bloc.articles[index].urlToImage ?? "",
+                        imageUrl: articles[index].urlToImage ?? "",
                         height: 220,
                         width: double.infinity,
                         fit: BoxFit.cover,
@@ -126,30 +139,28 @@ class NewsScreen extends StatelessWidget {
                             Center(child: Icon(Icons.error)),
                       ),
                     ),
-                    Text(
-                      bloc.articles[index].title ?? "",
-                        maxLines: 2, style: context.titleMedium()
-                    ),
+                    Text(articles[index].title ?? "",
+                        maxLines: 2, style: context.titleMedium()),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
                           flex: 2,
                           child: Text(
-                              "${'by'.tr()} : ${bloc.articles[index].author ?? ""}",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: context.bodySmall()),
+                            "${'by'.tr()} : ${articles[index].author ?? ""}",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: context.bodySmall(),
+                          ),
                         ),
                         Expanded(
                           child: Text(
-                              bloc.articles[index]
-                                  .publishedAt
-                                  ?.substring(0, 10) ??
-                                  "",
-                              maxLines: 1,
-                              textAlign: TextAlign.end,
-                              style: context.bodySmall()),
+                            articles[index].publishedAt?.substring(0, 10) ??
+                                "",
+                            maxLines: 1,
+                            textAlign: TextAlign.end,
+                            style: context.bodySmall(),
+                          ),
                         ),
                       ],
                     ),
@@ -158,9 +169,11 @@ class NewsScreen extends StatelessWidget {
               ),
             );
           },
-          itemCount: bloc.articles.length,
         );
-      },
+      }, listener: (BuildContext context, HomeStates state) {  },
     );
   }
 }
+
+
+

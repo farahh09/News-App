@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:news/core/constants.dart';
+import 'package:news/core/my_interceptor.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 @lazySingleton
@@ -22,7 +23,7 @@ class ApiManager {
       ),
     );
 
-    //dio.interceptors.add(MyInterceptor());
+    dio.interceptors.add(MyInterceptor());
     dio.interceptors.add(
       PrettyDioLogger(
         request: true,
