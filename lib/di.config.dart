@@ -11,13 +11,16 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
-
-import 'core/api_manager.dart' as _i331;
-import 'core/bloc/cubit.dart' as _i595;
-import 'core/internet_checker.dart' as _i94;
-import 'core/repository/home_repo.dart' as _i65;
-import 'core/repository/home_repo_remote.dart' as _i152;
-import 'core/theming/bloc/cubit.dart' as _i262;
+import 'package:news/core/api_manager.dart' as _i885;
+import 'package:news/core/bloc/cubit.dart' as _i451;
+import 'package:news/core/internet_checker.dart' as _i405;
+import 'package:news/core/repository/local/home_local_repo.dart' as _i585;
+import 'package:news/core/repository/local/home_local_repo_implementation.dart'
+    as _i130;
+import 'package:news/core/repository/remote/home_remote_repo_implementation.dart'
+    as _i774;
+import 'package:news/core/repository/remote/home_repo_remote.dart' as _i709;
+import 'package:news/core/theming/bloc/cubit.dart' as _i388;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -26,13 +29,21 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
-    gh.factory<_i262.ThemingCubit>(() => _i262.ThemingCubit());
-    gh.singleton<_i94.InternetConnectivity>(() => _i94.InternetConnectivity());
-    gh.lazySingleton<_i331.ApiManager>(() => _i331.ApiManager());
-    gh.factory<_i65.HomeRepo>(
-      () => _i152.HomeRepoRemote(gh<_i331.ApiManager>()),
+    gh.factory<_i388.ThemingCubit>(() => _i388.ThemingCubit());
+    gh.singleton<_i405.InternetConnectivity>(
+      () => _i405.InternetConnectivity(),
     );
-    gh.factory<_i595.HomeCubit>(() => _i595.HomeCubit(gh<_i65.HomeRepo>()));
+    gh.lazySingleton<_i885.ApiManager>(() => _i885.ApiManager());
+    gh.factory<_i585.HomeLocalRepo>(() => _i130.HomeRepoLocalImpl());
+    gh.factory<_i709.HomeRemoteRepo>(
+      () => _i774.HomeRepoRemoteImpl(gh<_i885.ApiManager>()),
+    );
+    gh.factory<_i451.HomeCubit>(
+      () => _i451.HomeCubit(
+        gh<_i709.HomeRemoteRepo>(),
+        gh<_i585.HomeLocalRepo>(),
+      ),
+    );
     return this;
   }
 }

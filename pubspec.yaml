@@ -25,7 +25,8 @@ dependencies:
   webview_flutter: ^4.13.1
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-
+  flutter_native_splash: ^2.4.7
+  shared_preferences: ^2.5.4
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
@@ -43,3 +44,19 @@ flutter:
   assets:
     - assets/images/
     - assets/translations/
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  color_dark: "#171717"
+  image: assets/images/logo.png
+  image_dark: assets/images/logo_dark.png
+  branding: assets/images/branding.png
+  branding_dark: assets/images/branding_dark.png
+  branding_bottom_padding: 24
+  android_12:
+    color: "#FFFFFF"
+    color_dark: "#171717"
+    image: assets/images/logo.png
+    image_dark: assets/images/logo_dark.png
+    branding: assets/images/branding.png
+    branding_dark: assets/images/branding_dark.png

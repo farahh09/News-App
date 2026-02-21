@@ -1,10 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:news/core/internet_checker.dart';
 import 'package:news/core/observer.dart';
+import 'package:news/core/shared_pref.dart';
 import 'package:news/core/theming/bloc/cubit.dart';
 import 'package:news/screens/home_screen.dart';
 import 'core/theming/bloc/states.dart';
@@ -19,6 +19,7 @@ void main() async {
   Bloc.observer = MyBlocObserver();
   await EasyLocalization.ensureInitialized();
   await Hive.initFlutter();
+  await SharedPref.init();
   Hive.registerAdapter(SourcesAdapter());
   Hive.registerAdapter(SourcesResponseAdapter());
   Hive.registerAdapter(NewsResponseAdapter());
@@ -27,7 +28,7 @@ void main() async {
   getIt<InternetConnectivity>().initialize();
   runApp(
     BlocProvider(
-      create: (context) => getIt<ThemingCubit>(),
+      create: (context) => getIt<ThemingCubit>()..getTheme(),
       child: BlocBuilder<ThemingCubit, ThemingStates>(
         builder: (BuildContext context, state) {
           return EasyLocalization(

@@ -28,7 +28,7 @@ class _SourcesViewState extends State<SourcesView> {
       listener: (context, state) {
         if (state is GetSourcesLoadingState) {
           context.loaderOverlay.show();
-        } else {
+        } else if (context.loaderOverlay.visible) {
           context.loaderOverlay.hide();
         }
       },

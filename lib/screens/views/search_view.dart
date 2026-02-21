@@ -20,18 +20,13 @@ class SearchView extends StatefulWidget {
 }
 
 class _SearchViewState extends State<SearchView> {
-
   String updatedQuery = '';
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeCubit, HomeStates>(
       builder: (context, state) {
         var bloc = BlocProvider.of<HomeCubit>(context);
-        if (updatedQuery != widget.query) {
-          updatedQuery = widget.query;
-          bloc.searchArticles(widget.query);
-        }
-        final articles = bloc.filteredArticles;
 
         if (state is GetNewsDataErrorState) {
           return Center(child: Text('something_went_wrong'.tr()));
@@ -40,7 +35,13 @@ class _SearchViewState extends State<SearchView> {
             state is GetNewsDataLoadingState) {
           return const Center(child: CircularProgressIndicator());
         }
-        else if (articles.isEmpty) {
+        if (updatedQuery != widget.query) {
+          updatedQuery = widget.query;
+          bloc.searchArticles(widget.query);
+        }
+
+        final articles = bloc.filteredArticles;
+        if (articles.isEmpty) {
           return Center(child: Text('no_data'.tr()));
         }
 

@@ -95,12 +95,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: context.titleLarge(),
               ),
               actions: [
-
+                if (!isSearching)
                   IconButton(
                     onPressed: () {
-                     selectedCategory != null && !isSearching
-                     ? isSearching = true
-                     : isSearching = false;
+                      if (selectedCategory != null && !isSearching) {
+                        isSearching = true;
+                      } else {
+                        isSearching = false;
+                      }
                       setState(() {});
                     },
                     icon: ImageIcon(

@@ -70,7 +70,7 @@ class NewsScreen extends StatelessWidget {
                               SizedBox(height: 8),
                               ElevatedButton(
                                 onPressed: () {
-                                  final url = bloc.articles[index].url;
+                                  var url = bloc.articles[index].url;
                                   if (url != null && url.isNotEmpty) {
                                     Navigator.pop(context);
                                     Navigator.push(

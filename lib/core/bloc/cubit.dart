@@ -2,15 +2,15 @@ import 'package:bloc/bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:news/core/bloc/states.dart';
 import 'package:news/core/internet_checker.dart';
-import 'package:news/core/repository/home_repo_local.dart';
-import 'package:news/core/repository/home_repo_remote.dart';
+import 'package:news/core/repository/local/home_local_repo.dart';
+import 'package:news/core/repository/remote/home_repo_remote.dart';
 import 'package:news/models/news_response.dart';
 import 'package:news/models/sources_response.dart';
 
 @injectable
 class HomeCubit extends Cubit<HomeStates> {
-  HomeRepoRemote repo;
-  HomeRepoLocal localRepo;
+  HomeRemoteRepo repo;
+  HomeLocalRepo localRepo;
 
   HomeCubit(this.repo, this.localRepo) : super(HomeInitState());
   List<Sources> sources = [];
@@ -26,22 +26,20 @@ class HomeCubit extends Cubit<HomeStates> {
   }
 
   void searchArticles(String query) {
-
     if (query.isEmpty) {
       filteredArticles = articles;
     } else {
       filteredArticles = articles.where((article) {
         var searchQuery = query.trim().toLowerCase();
 
-        return article.title!.toLowerCase().contains(searchQuery)
-        || article.description!.contains(searchQuery)
-        || article.author!.contains(searchQuery);
+        return (article.title?.toLowerCase().contains(searchQuery) ?? false)
+            || (article.description?.toLowerCase().contains(searchQuery) ?? false)
+            || (article.author?.toLowerCase().contains(searchQuery) ?? false);
 
       }).toList();
     }
     emit(SearchArticlesState());
   }
-
   Future<void> getNewsData() async {
     emit(GetNewsDataLoadingState());
 
